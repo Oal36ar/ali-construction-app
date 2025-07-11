@@ -1,0 +1,181 @@
+{
+  "timestamp": "2025-07-08T22:17:33.828727",
+  "passed": 4,
+  "failed": 7,
+  "results": {
+    "/": {
+      "status": "\u2705 PASS",
+      "response_time": "2.037s",
+      "data": {
+        "message": "\ud83e\udd16 AI Orchestrator API",
+        "version": "1.0.0",
+        "status": "operational",
+        "timestamp": "2025-07-08T22:17:13.311249",
+        "endpoints": {
+          "chat": "/chat",
+          "upload": "/upload",
+          "confirm": "/confirm",
+          "reminders": "/reminders/all",
+          "history": "/history/activity",
+          "tools": "/tools/available",
+          "health": "/health",
+          "test": "/test/full"
+        }
+      }
+    },
+    "/health": {
+      "status": "\u2705 PASS",
+      "response_time": "2.013s",
+      "data": {
+        "status": "healthy",
+        "timestamp": "2025-07-08T22:17:15.326440",
+        "version": "1.0.0",
+        "services": {
+          "database": "connected",
+          "llm": "connected",
+          "langchain": "available"
+        },
+        "endpoints": {
+          "chat": "\u2705 Available",
+          "upload": "\u2705 Available",
+          "confirm": "\u2705 Available",
+          "reminders": "\u2705 Available",
+          "history": "\u2705 Available",
+          "tools": "\u2705 Available"
+        },
+        "cors_origins": [
+          "http://localhost:5173",
+          "http://127.0.0.1:5173",
+          "http://localhost:3000"
+        ]
+      }
+    },
+    "/status": {
+      "status": "\u2705 PASS",
+      "response_time": "2.056s",
+      "data": {
+        "status": "connected",
+        "backend": "running",
+        "model": "google/gemini-2.5-flash",
+        "timestamp": "2025-07-08T22:17:17.386925",
+        "langchain": "available",
+        "database": "connected"
+      }
+    },
+    "/chat": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/tools/available": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/upload/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/reminders/all": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/reminders/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/history/activity": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/confirm/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 404",
+      "response": "{\"detail\":\"Not Found\"}"
+    },
+    "/test/full": {
+      "status": "\u2705 PASS",
+      "response_time": "2.038s",
+      "data": {
+        "timestamp": "2025-07-08T22:17:33.822464",
+        "overall_status": "\u26a0\ufe0f PARTIAL FUNCTIONALITY",
+        "tests": {
+          "health": {
+            "status": "\u2705 PASS",
+            "response_time": "< 50ms",
+            "data": {
+              "status": "healthy",
+              "timestamp": "2025-07-08T22:17:33.822637",
+              "version": "1.0.0",
+              "services": {
+                "database": "connected",
+                "llm": "connected",
+                "langchain": "available"
+              },
+              "endpoints": {
+                "chat": "\u2705 Available",
+                "upload": "\u2705 Available",
+                "confirm": "\u2705 Available",
+                "reminders": "\u2705 Available",
+                "history": "\u2705 Available",
+                "tools": "\u2705 Available"
+              },
+              "cors_origins": [
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:3000"
+              ]
+            }
+          },
+          "chat_mock": {
+            "status": "\u2705 PASS",
+            "response_time": "< 100ms",
+            "data": {
+              "response_length": 172,
+              "model": "mock-model",
+              "success": true
+            }
+          },
+          "file_analysis": {
+            "status": "\u2705 PASS",
+            "response_time": "< 100ms",
+            "data": {
+              "suggested_action": "analyze_txt",
+              "confidence": 0.95
+            }
+          },
+          "database": {
+            "status": "\u2705 PASS",
+            "connection": "active",
+            "tables": [
+              "reminders",
+              "chat_history",
+              "file_uploads",
+              "action_logs"
+            ]
+          },
+          "langchain_tools": {
+            "status": "\u274c FAIL",
+            "error": "object of type 'ToolRegistry' has no len()"
+          }
+        },
+        "summary": {
+          "passed": 4,
+          "failed": 1,
+          "skipped": 0,
+          "total": 5
+        }
+      }
+    },
+    "/api/*": {
+      "status": "\u2139\ufe0f  MANUAL",
+      "note": "Test by visiting frontend"
+    }
+  },
+  "backend_url": "http://localhost:8000",
+  "frontend_url": "http://localhost:5173"
+}
