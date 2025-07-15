@@ -1,0 +1,221 @@
+{
+  "timestamp": "2025-07-08T22:35:21.362012",
+  "passed": 8,
+  "failed": 4,
+  "results": {
+    "/": {
+      "status": "\u2705 PASS",
+      "response_time": "2.022s",
+      "data": {
+        "message": "\ud83e\udd16 AI Orchestrator API",
+        "version": "1.0.0",
+        "status": "operational",
+        "timestamp": "2025-07-08T22:34:27.965722",
+        "endpoints": {
+          "chat": "/chat",
+          "upload": "/upload",
+          "confirm": "/confirm",
+          "reminders": "/reminders/all",
+          "history": "/history/activity",
+          "tools": "/tools/available",
+          "health": "/health",
+          "test": "/test/full"
+        }
+      }
+    },
+    "/health": {
+      "status": "\u2705 PASS",
+      "response_time": "2.037s",
+      "data": {
+        "status": "healthy",
+        "timestamp": "2025-07-08T22:34:30.004593",
+        "version": "1.0.0",
+        "services": {
+          "database": "connected",
+          "llm": "connected",
+          "langchain": "available"
+        },
+        "endpoints": {
+          "chat": "\u2705 Available",
+          "upload": "\u2705 Available",
+          "confirm": "\u2705 Available",
+          "reminders": "\u2705 Available",
+          "history": "\u2705 Available",
+          "tools": "\u2705 Available"
+        },
+        "cors_origins": [
+          "http://localhost:5173",
+          "http://127.0.0.1:5173",
+          "http://localhost:3000"
+        ]
+      }
+    },
+    "/status": {
+      "status": "\u2705 PASS",
+      "response_time": "2.058s",
+      "data": {
+        "status": "connected",
+        "backend": "running",
+        "model": "google/gemini-2.5-flash",
+        "timestamp": "2025-07-08T22:34:32.063284",
+        "langchain": "available",
+        "database": "connected"
+      }
+    },
+    "/startup-check": {
+      "status": "\u2705 PASS",
+      "response_time": "2.036s",
+      "data": {
+        "status": "ok",
+        "routes_loaded": [
+          "chat",
+          "upload",
+          "confirm",
+          "reminders",
+          "history"
+        ],
+        "expected_routes": [
+          "chat",
+          "upload",
+          "reminders",
+          "confirm",
+          "history"
+        ],
+        "all_routes_ready": true,
+        "missing_routes": [],
+        "timestamp": "2025-07-08T22:34:38.199230"
+      }
+    },
+    "/chat": {
+      "status": "\u2705 PASS",
+      "response_time": "2.057s",
+      "data": {
+        "response": "Mock response for: Hello, route test!...",
+        "model": "mock-model",
+        "plugin": null,
+        "input_type": "text",
+        "processed_files": 0,
+        "file_previews": [],
+        "session_id": null,
+        "success": true,
+        "error": null
+      }
+    },
+    "/tools/available": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 500",
+      "response": "{\"detail\":\"Error retrieving tools: 'ToolRegistry' object is not iterable\"}"
+    },
+    "/upload/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 422",
+      "response": "{\"error\":\"Validation failed\",\"detail\":\"Chat input rejected by server - check formatting or file attachment.\",\"validation_errors\":[{\"field\":\"body -> file\",\"message\":\"Field required\",\"type\":\"missing\",\"input\":null}],\"help\":\"Check that all required fields are provided and properly formatted\"}"
+    },
+    "/reminders/all": {
+      "status": "\u2705 PASS",
+      "response_time": "2.060s",
+      "data": []
+    },
+    "/reminders/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 500",
+      "response": "Internal Server Error"
+    },
+    "/history/activity": {
+      "status": "\u2705 PASS",
+      "response_time": "2.072s",
+      "data": {
+        "summary": {
+          "total_chats": 0,
+          "total_uploads": 0,
+          "total_activity": 0
+        },
+        "recent_chats": [],
+        "recent_uploads": [],
+        "last_activity": null,
+        "timestamp": "2025-07-08T22:35:02.881880"
+      }
+    },
+    "/confirm/": {
+      "status": "\u274c FAIL",
+      "error": "HTTP 500",
+      "response": "Internal Server Error"
+    },
+    "/test/full": {
+      "status": "\u2705 PASS",
+      "response_time": "2.059s",
+      "data": {
+        "timestamp": "2025-07-08T22:35:06.993842",
+        "overall_status": "\u26a0\ufe0f PARTIAL FUNCTIONALITY",
+        "tests": {
+          "health": {
+            "status": "\u2705 PASS",
+            "response_time": "< 50ms",
+            "data": {
+              "status": "healthy",
+              "timestamp": "2025-07-08T22:35:06.994027",
+              "version": "1.0.0",
+              "services": {
+                "database": "connected",
+                "llm": "connected",
+                "langchain": "available"
+              },
+              "endpoints": {
+                "chat": "\u2705 Available",
+                "upload": "\u2705 Available",
+                "confirm": "\u2705 Available",
+                "reminders": "\u2705 Available",
+                "history": "\u2705 Available",
+                "tools": "\u2705 Available"
+              },
+              "cors_origins": [
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:3000"
+              ]
+            }
+          },
+          "chat_mock": {
+            "status": "\u2705 PASS",
+            "response_time": "< 100ms",
+            "data": {
+              "response_length": 172,
+              "model": "mock-model",
+              "success": true
+            }
+          },
+          "file_analysis": {
+            "status": "\u2705 PASS",
+            "response_time": "< 100ms",
+            "data": {
+              "suggested_action": "analyze_txt",
+              "confidence": 0.95
+            }
+          },
+          "database": {
+            "status": "\u2705 PASS",
+            "connection": "active",
+            "tables": [
+              "reminders",
+              "chat_history",
+              "file_uploads",
+              "action_logs"
+            ]
+          },
+          "langchain_tools": {
+            "status": "\u274c FAIL",
+            "error": "object of type 'ToolRegistry' has no len()"
+          }
+        },
+        "summary": {
+          "passed": 4,
+          "failed": 1,
+          "skipped": 0,
+          "total": 5
+        }
+      }
+    }
+  },
+  "backend_url": "http://localhost:8000",
+  "frontend_url": "http://localhost:5173"
+}

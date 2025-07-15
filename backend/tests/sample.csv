@@ -1,0 +1,9 @@
+Task,Assigned_To,Start_Date,End_Date,Status,Priority,Budget
+Demolition Work,John Smith,2023-12-01,2023-12-15,Completed,High,25000
+Electrical Installation,Mike Johnson,2024-01-05,2024-01-25,In Progress,High,45000
+Plumbing Setup,Sarah Davis,2024-01-10,2024-01-30,Pending,Medium,32000
+Flooring Installation,Bob Wilson,2024-02-01,2024-02-20,Scheduled,Medium,28000
+Interior Painting,Lisa Brown,2024-02-15,2024-03-05,Scheduled,Low,15000
+Window Installation,Tom Anderson,2024-02-20,2024-03-10,Scheduled,High,38000
+Final Inspection,Inspector Garcia,2024-03-15,2024-03-15,Scheduled,High,2000
+Cleanup,Cleaning Crew,2024-03-16,2024-03-20,Scheduled,Low,8000 

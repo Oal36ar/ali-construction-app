@@ -1,0 +1,18 @@
+Test Document for Backend QA
+
+This is a sample text file for testing the file upload and parsing functionality.
+
+Important Information:
+- Omar visa renewal: 2027-11-20
+- Project deadline: 2024-02-15
+- Meeting scheduled: 2024-01-30 at 2:00 PM
+
+Content for analysis:
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+The file contains multiple paragraphs and various dates that should be extracted for reminder creation testing.
+
+Additional notes:
+- This file tests basic text parsing
+- Contains embedded dates for reminder extraction
+- Includes sample content for embedding and retrieval testing 
