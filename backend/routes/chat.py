@@ -17,7 +17,7 @@ from schemas.chat import ChatRequest, DebugChatRequest
 from schemas.response import ChatResponse, MultimodalChatResponse
 from agents.orchestrator_agent import agent_manager
 from utils.file_parser import parse_file_by_type, detect_file_type
-from utils.embedding_manager import embedding_manager
+from utils.enhanced_embedding_manager import enhanced_embedding_manager
 
 router = APIRouter()
 
@@ -112,9 +112,9 @@ async def process_uploaded_files(files: List[UploadFile]) -> str:
                 file_contents.append("=" * 50)
                 
                 # Optionally create embeddings for future retrieval
-                if embedding_manager.is_available():
+                if enhanced_embedding_manager.is_available():
                     try:
-                        embedding_manager.embed_file_content(parse_result["text"], file.filename)
+                        await enhanced_embedding_manager.embed_file_content(parse_result["text"], file.filename, file_type)
                         print(f"✅ Created embeddings for {file.filename}")
                     except Exception as e:
                         print(f"⚠️ Embedding error for {file.filename}: {e}")
@@ -130,7 +130,7 @@ async def process_uploaded_files(files: List[UploadFile]) -> str:
 
 async def enhance_message_with_context(message: str, files: List[UploadFile] = None) -> str:
     """
-    Enhance user message with file content and optionally with embedding retrieval
+    Enhance user message with file content and embedding retrieval from previously uploaded files
     
     Args:
         message: Original user message
@@ -148,13 +148,13 @@ async def enhance_message_with_context(message: str, files: List[UploadFile] = N
         if file_content:
             enhanced_parts.append(file_content)
     
-    # Add embedding-based context if available and no files uploaded
-    if not files and embedding_manager.is_available() and embedding_manager.vector_store is not None:
+    # ALWAYS check for embedding-based context from previously uploaded files
+    if enhanced_embedding_manager.is_available() and enhanced_embedding_manager.vector_store is not None:
         try:
-            retrieval_context = embedding_manager.get_retrieval_context(message, max_chunks=3)
+            retrieval_context = enhanced_embedding_manager.get_retrieval_context(message, max_chunks=3)
             if retrieval_context:
                 enhanced_parts.append(retrieval_context)
-                print(f"✅ Added embedding-based context")
+                print(f"✅ Added embedding-based context from previously uploaded files")
         except Exception as e:
             print(f"⚠️ Error retrieving context: {e}")
     
@@ -253,10 +253,9 @@ async def chat_main(
                 try:
                     print(f"🔄 Processing with LLM Orchestrator...")
                     # Use enhanced message instead of original
-                    response_text = await run_orchestrator(
-                        input_text=enhanced_message,
-                        db_session=db
-                    )
+                    agent = agent_manager.get_or_create_agent(session_id, db_session=db)
+                    result = await agent.process_message(enhanced_message)
+                    response_text = result.get("response", "")
                     print(f"✅ LLM Orchestrator result received")
                     
                     # Check if response indicates an error
@@ -536,19 +535,26 @@ async def chat_stream(
             # Process message (similar to main chat endpoint)
             session_id_final = session_id or "default"
             
+            # ===== ENHANCE MESSAGE WITH CONTEXT =====
+            enhanced_message = await enhance_message_with_context(message.strip(), files=None)
+            
+            if enhanced_message != message.strip():
+                print(f"✅ Enhanced streaming message with context")
+                print(f"📊 Enhanced message length: {len(enhanced_message)}")
+            
             # Get response (using existing logic)
             if HAS_LLM_ORCHESTRATOR:
                 try:
                     response_text = await run_orchestrator(
-                        input_text=message,
+                        input_text=enhanced_message,
                         db_session=db
                     )
                 except Exception as e:
                     print(f"⚠️ LLM Orchestrator failed: {e}")
-                    mock_result = await mock_llm_response(message, files=None)
+                    mock_result = await mock_llm_response(enhanced_message, files=None)
                     response_text = mock_result.get("response", "Mock response generated")
             else:
-                mock_result = await mock_llm_response(message, files=None)
+                mock_result = await mock_llm_response(enhanced_message, files=None)
                 response_text = mock_result.get("response", "Mock response generated")
             
             # Stream the response word by word

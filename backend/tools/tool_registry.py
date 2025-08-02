@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from langchain.tools import Tool
 from sqlalchemy.orm import Session
+from .file_tools import SummarizeFileTool, AnalyzeFileTool, RetrieveUploadedFileTool
 
 
 class ToolRegistry:
@@ -27,7 +28,8 @@ class ToolRegistry:
             self._create_summarize_file_tool(),
             self._create_parse_contacts_tool(),
             self._create_list_reminders_tool(),
-            self._create_analyze_document_tool()
+            self._create_analyze_document_tool(),
+            self._create_retrieve_uploaded_file_tool()
         ]
     
     def _create_add_reminder_tool(self) -> Tool:
@@ -380,106 +382,24 @@ class ToolRegistry:
     
     def _create_analyze_document_tool(self) -> Tool:
         """Create the analyze document tool"""
-        def analyze_document(content: str) -> str:
-            """Perform comprehensive analysis of document content.
-            
-            Args:
-                content: Document content to analyze
-            
-            Returns:
-                Detailed analysis report
-            """
-            try:
-                if not content or len(content.strip()) < 20:
-                    return "❌ Content too short for meaningful analysis"
-                
-                # Basic metrics
-                words = content.split()
-                sentences = [s.strip() for s in content.split('.') if s.strip()]
-                lines = content.split('\n')
-                
-                # Content analysis
-                emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', content)
-                phones = re.findall(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', content)
-                dates = re.findall(r'\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2}', content)
-                
-                # Keywords analysis
-                business_keywords = ['project', 'meeting', 'deadline', 'client', 'proposal', 'contract']
-                tech_keywords = ['api', 'database', 'server', 'development', 'code', 'software']
-                urgency_keywords = ['urgent', 'asap', 'immediate', 'critical', 'emergency']
-                
-                found_business = [kw for kw in business_keywords if kw.lower() in content.lower()]
-                found_tech = [kw for kw in tech_keywords if kw.lower() in content.lower()]
-                found_urgency = [kw for kw in urgency_keywords if kw.lower() in content.lower()]
-                
-                # Document type detection
-                doc_type = "General"
-                if found_business:
-                    doc_type = "Business Document"
-                elif found_tech:
-                    doc_type = "Technical Document"
-                
-                if found_urgency:
-                    doc_type += " (Urgent)"
-                
-                # Generate analysis report
-                analysis = f"📊 Document Analysis Report\n\n"
-                analysis += f"📄 Document Type: {doc_type}\n"
-                analysis += f"📏 Length: {len(words)} words, {len(sentences)} sentences, {len(lines)} lines\n\n"
-                
-                analysis += "🔍 Content Overview:\n"
-                if len(sentences) > 0:
-                    analysis += f"  • Opening: {sentences[0][:100]}...\n"
-                if len(sentences) > 2:
-                    analysis += f"  • Key point: {sentences[len(sentences)//2][:100]}...\n"
-                if len(sentences) > 1:
-                    analysis += f"  • Conclusion: {sentences[-1][:100]}...\n"
-                
-                if emails or phones or dates:
-                    analysis += "\n📋 Key Information Found:\n"
-                    if emails:
-                        analysis += f"  📧 Email addresses: {len(emails)}\n"
-                    if phones:
-                        analysis += f"  📞 Phone numbers: {len(phones)}\n"
-                    if dates:
-                        analysis += f"  📅 Dates mentioned: {len(dates)}\n"
-                
-                if found_business or found_tech or found_urgency:
-                    analysis += "\n🏷️ Keywords Analysis:\n"
-                    if found_business:
-                        analysis += f"  💼 Business: {', '.join(found_business)}\n"
-                    if found_tech:
-                        analysis += f"  💻 Technical: {', '.join(found_tech)}\n"
-                    if found_urgency:
-                        analysis += f"  ⚠️ Urgency: {', '.join(found_urgency)}\n"
-                
-                # Recommendations
-                analysis += "\n💡 Recommendations:\n"
-                if dates:
-                    analysis += "  • Consider adding reminders for mentioned dates\n"
-                if emails:
-                    analysis += "  • Extract contacts for future reference\n"
-                if found_urgency:
-                    analysis += "  • Prioritize urgent items mentioned in document\n"
-                if len(words) > 500:
-                    analysis += "  • Document is lengthy - consider creating a summary\n"
-                
-                return analysis
-                
-            except Exception as e:
-                return f"❌ Failed to analyze document: {str(e)}"
+        analyze_tool = AnalyzeFileTool(db_session=self.db_session)
         
         return Tool(
             name="analyze_document",
-            description="""Perform comprehensive analysis of document content. Use this when the user wants to:
-            - Analyze a document thoroughly
-            - Get insights about content
-            - Understand document structure
-            - Extract key information patterns
-            
-            Input: Document content to analyze
-            Returns: Detailed analysis report with metrics, content overview, and recommendations""",
-            func=analyze_document
+            description=analyze_tool.description,
+            func=analyze_tool._run,
+            coroutine=analyze_tool._arun
+        )
+    
+    def _create_retrieve_uploaded_file_tool(self) -> Tool:
+        """Create tool for retrieving uploaded file content"""
+        retrieve_tool = RetrieveUploadedFileTool(db_session=self.db_session)
+        
+        return Tool(
+            name="retrieve_uploaded_file",
+            description=retrieve_tool.description,
+            func=retrieve_tool._run,
+            coroutine=retrieve_tool._arun
         )
     
     def get_tools(self) -> List[Tool]:
@@ -501,4 +421,4 @@ class ToolRegistry:
 # Global tool registry instance
 def create_tool_registry(db_session: Optional[Session] = None) -> ToolRegistry:
     """Create a new tool registry instance"""
-    return ToolRegistry(db_session) 
+    return ToolRegistry(db_session)

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from utils.database import get_db, FileUpload
 from schemas.response import FileUploadResponse
 from utils.file_parser import parse_file_by_type, detect_file_type
-from utils.embedding_manager import embedding_manager
+from utils.enhanced_embedding_manager import enhanced_embedding_manager
 from typing import Optional
 import uuid
 
@@ -62,13 +62,14 @@ async def upload_file(
         
         print(f"✅ File parsing complete - content length: {len(parse_result['text'])}")
         
-        # Store file upload record
+        # Store file upload record with parsed content
         file_upload = FileUpload(
             filename=file.filename,
             file_type=file_type,
             file_size=len(content),
             intent=intent or "auto",
-            processed=True
+            processed=True,
+            content=parse_result["text"]  # Store the parsed content
         )
         
         db.add(file_upload)
@@ -78,15 +79,16 @@ async def upload_file(
         
         # Optional: Create embeddings if available
         embedding_success = False
-        if embedding_manager.is_available():
+        if enhanced_embedding_manager.is_available():
             try:
                 print(f"🔄 Creating embeddings...")
-                embedding_success, chunks = embedding_manager.embed_file_content(
-                    parse_result["text"], 
-                    file.filename
+                embedding_success = await enhanced_embedding_manager.embed_file_content(
+                    content=parse_result["text"], 
+                    filename=file.filename,
+                    file_type=file_type
                 )
                 if embedding_success:
-                    print(f"✅ Created {len(chunks)} embedding chunks")
+                    print(f"✅ Embedding creation successful")
                 else:
                     print(f"⚠️ Embedding creation failed")
             except Exception as e:
@@ -168,13 +170,35 @@ async def get_upload_history(
 
 @router.get("/embedding-stats")
 async def get_embedding_stats():
-    """Get statistics about embedded files"""
-    
-    stats = embedding_manager.get_stats()
-    return {
-        "embedding_available": stats["available"],
-        "total_chunks": stats["total_chunks"],
-        "has_vector_store": stats["has_vector_store"],
-        "unique_sources": stats.get("unique_sources", 0),
-        "sources": stats.get("sources", [])
-    } 
+    """Get embedding statistics."""
+    try:
+        stats = enhanced_embedding_manager.get_stats()
+        
+        # Extract relevant information for the frontend
+        local_stats = stats.get("local_stats", {})
+        supabase_stats = stats.get("supabase_stats", {})
+        
+        # Combine stats from both sources
+        total_chunks = local_stats.get("total_chunks", 0) + supabase_stats.get("total_embeddings", 0)
+        unique_sources = local_stats.get("unique_sources", 0) + supabase_stats.get("unique_documents", 0)
+        has_vector_store = local_stats.get("has_vector_store", False) or supabase_stats.get("total_embeddings", 0) > 0
+        
+        # Combine sources from both
+        sources = local_stats.get("sources", [])
+        if "file_types_distribution" in supabase_stats:
+            sources.extend(list(supabase_stats["file_types_distribution"].keys()))
+        
+        return {
+            "embedding_available": stats.get("openai_available", False),
+            "total_chunks": total_chunks,
+            "has_vector_store": has_vector_store,
+            "unique_sources": unique_sources,
+            "sources": list(set(sources)),  # Remove duplicates
+            "supabase_available": stats.get("supabase_available", False),
+            "local_available": stats.get("local_available", False),
+            "supabase_stats": supabase_stats,
+            "local_stats": local_stats
+        }
+    except Exception as e:
+        print(f"❌ Error getting embedding stats: {e}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving embedding stats: {str(e)}")

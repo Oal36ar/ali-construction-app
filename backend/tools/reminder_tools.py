@@ -20,8 +20,8 @@ class ReminderInput(BaseModel):
 
 class AddReminderTool(BaseTool):
     """Tool for adding reminders to the system"""
-    name = "add_reminder"
-    description = """Add a new reminder to the system. 
+    name: str = "add_reminder"
+    description: str = """Add a new reminder to the system. 
     Use this when user wants to create, add, or set a reminder.
     Examples: 'remind me to...', 'add reminder for...', 'create a reminder about...'"""
     args_schema: Type[BaseModel] = ReminderInput
@@ -84,9 +84,9 @@ class ListRemindersInput(BaseModel):
 
 
 class ListRemindersTool(BaseTool):
-    """Tool for listing existing reminders"""
-    name = "list_reminders"
-    description = """List existing reminders from the system. 
+    """Tool for listing reminders"""
+    name: str = "list_reminders"
+    description: str = """List existing reminders from the system. 
     Use this when user wants to see, check, or view their reminders.
     Examples: 'show my reminders', 'what reminders do I have?', 'list my tasks'"""
     args_schema: Type[BaseModel] = ListRemindersInput

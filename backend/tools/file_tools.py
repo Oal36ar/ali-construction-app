@@ -5,9 +5,18 @@ LangChain Tools for File and Text Processing
 
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import Optional, Type, List
 from datetime import datetime
+from sqlalchemy.orm import Session
 import re
+
+# Import database utilities
+try:
+    from utils.database import get_db, FileUpload
+    DATABASE_AVAILABLE = True
+except ImportError:
+    DATABASE_AVAILABLE = False
+    print("⚠️ Database utilities not available for file tools")
 
 
 class SummaryInput(BaseModel):
@@ -19,8 +28,8 @@ class SummaryInput(BaseModel):
 
 class SummarizeFileTool(BaseTool):
     """Tool for summarizing text content"""
-    name = "summarize_file"
-    description = """Summarize long text content into a shorter, concise summary. 
+    name: str = "summarize_file"
+    description: str = """Summarize long text content into a shorter, concise summary. 
     Use this when user wants to summarize, condense, or get a brief overview of text.
     Examples: 'summarize this document', 'give me a summary of...', 'condense this text'"""
     args_schema: Type[BaseModel] = SummaryInput
@@ -142,9 +151,9 @@ class FileAnalysisInput(BaseModel):
 
 
 class AnalyzeFileTool(BaseTool):
-    """Tool for analyzing file content and extracting insights"""
-    name = "analyze_file"
-    description = """Analyze file content and extract insights, patterns, and key information. 
+    """Tool for analyzing file content"""
+    name: str = "analyze_file"
+    description: str = """Analyze file content and extract insights, patterns, and key information. 
     Use this when user wants to analyze, examine, or get insights from a file.
     Examples: 'analyze this file', 'what's in this document?', 'examine the content'"""
     args_schema: Type[BaseModel] = FileAnalysisInput
@@ -192,4 +201,86 @@ class AnalyzeFileTool(BaseTool):
 
     async def _arun(self, content: str, filename: str, file_type: str = "text") -> str:
         """Async version of the tool"""
-        return self._run(content, filename, file_type) 
+        return self._run(content, filename, file_type)
+
+
+class RetrieveFileInput(BaseModel):
+    """Input schema for retrieving uploaded files"""
+    filename: Optional[str] = Field(None, description="Name of the uploaded file to retrieve")
+    file_id: Optional[int] = Field(None, description="ID of the uploaded file to retrieve")
+    recent_count: int = Field(default=5, description="Number of recent files to list if no specific file requested")
+
+
+class RetrieveUploadedFileTool(BaseTool):
+    """Tool for retrieving uploaded file content from database"""
+    name: str = "retrieve_uploaded_file"
+    description: str = """Retrieve content from previously uploaded files stored in the database.
+    Use this when user asks about files they've uploaded before, wants to summarize uploaded files,
+    or references files without uploading new ones. Can retrieve by filename or list recent uploads.
+    Examples: 'summarize the file I uploaded', 'what was in that document?', 'show me my uploaded files'"""
+    args_schema: Type[BaseModel] = RetrieveFileInput
+    db_session: Optional[Session] = None
+    
+    def __init__(self, db_session: Session = None):
+        super().__init__()
+        self.db_session = db_session
+    
+    def _run(self, filename: Optional[str] = None, file_id: Optional[int] = None, recent_count: int = 5) -> str:
+        """Execute the file retrieval function"""
+        if not DATABASE_AVAILABLE:
+            return "❌ Database not available. Cannot retrieve uploaded files."
+        
+        try:
+            # Get database session
+            if self.db_session:
+                db = self.db_session
+                should_close = False
+            else:
+                db = next(get_db())
+                should_close = True
+            
+            try:
+                # If specific file requested by ID
+                if file_id:
+                    file_record = db.query(FileUpload).filter(FileUpload.id == file_id).first()
+                    if file_record and file_record.content:
+                        return f"📄 File: {file_record.filename}\n📊 Type: {file_record.file_type}\n📝 Content:\n{file_record.content}"
+                    elif file_record:
+                        return f"❌ File '{file_record.filename}' found but no content stored."
+                    else:
+                        return f"❌ No file found with ID {file_id}."
+                
+                # If specific file requested by filename
+                elif filename:
+                    file_record = db.query(FileUpload).filter(FileUpload.filename.ilike(f"%{filename}%")).first()
+                    if file_record and file_record.content:
+                        return f"📄 File: {file_record.filename}\n📊 Type: {file_record.file_type}\n📝 Content:\n{file_record.content}"
+                    elif file_record:
+                        return f"❌ File '{file_record.filename}' found but no content stored."
+                    else:
+                        return f"❌ No file found matching '{filename}'. Try listing recent files first."
+                
+                # List recent files if no specific file requested
+                else:
+                    recent_files = db.query(FileUpload).order_by(FileUpload.uploaded_at.desc()).limit(recent_count).all()
+                    
+                    if not recent_files:
+                        return "📁 No files have been uploaded yet. Please upload a file first."
+                    
+                    file_list = []
+                    for i, file_record in enumerate(recent_files, 1):
+                        status = "✅ Content available" if file_record.content else "❌ No content"
+                        file_list.append(f"{i}. {file_record.filename} (ID: {file_record.id}) - {file_record.file_type} - {status}")
+                    
+                    return f"📁 Recent uploaded files:\n" + "\n".join(file_list) + "\n\nTo retrieve a specific file, use the filename or ID."
+            
+            finally:
+                if should_close:
+                    db.close()
+        
+        except Exception as e:
+            return f"❌ Error retrieving file: {str(e)}"
+    
+    async def _arun(self, filename: Optional[str] = None, file_id: Optional[int] = None, recent_count: int = 5) -> str:
+        """Async version of the tool"""
+        return self._run(filename, file_id, recent_count)

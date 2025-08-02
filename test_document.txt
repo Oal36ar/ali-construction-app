@@ -1,0 +1,12 @@
+﻿Test Document for File Upload
+
+This is a test document to verify file upload functionality.
+It contains some sample text that should be processed by the system.
+
+Key points:
+- File upload testing
+- Content extraction
+- Embedding creation
+- Memory storage
+
+End of test document.

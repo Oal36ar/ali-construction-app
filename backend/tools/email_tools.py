@@ -22,8 +22,8 @@ class EmailInput(BaseModel):
 
 class SendEmailTool(BaseTool):
     """Tool for sending emails"""
-    name = "send_email"
-    description = """Send an email to a specified recipient. 
+    name: str = "send_email"
+    description: str = """Send an email to a specified recipient. 
     Use this when user wants to send, email, or notify someone.
     Examples: 'send email to...', 'email john about...', 'notify sarah that...'"""
     args_schema: Type[BaseModel] = EmailInput
@@ -67,8 +67,8 @@ class ContactInput(BaseModel):
 
 class ParseContactsTool(BaseTool):
     """Tool for parsing contact information from text"""
-    name = "parse_contacts"
-    description = """Parse and extract contact information from text. 
+    name: str = "parse_contacts"
+    description: str = """Parse and extract contact information from text. 
     Use this when user wants to extract, find, or parse contact details.
     Examples: 'extract contacts from...', 'find emails in...', 'parse contact info from...'"""
     args_schema: Type[BaseModel] = ContactInput
@@ -121,4 +121,4 @@ class ParseContactsTool(BaseTool):
 
     async def _arun(self, text: str) -> str:
         """Async version of the tool"""
-        return self._run(text) 
+        return self._run(text)

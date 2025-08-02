@@ -8,7 +8,8 @@ Supports both OpenRouter and OpenAI APIs with automatic model routing
 import os
 from typing import Dict, Any, List, Optional, Union
 try:
-    from langchain.agents import initialize_agent, AgentType
+    from langchain.agents import create_react_agent, AgentExecutor
+    from langchain.prompts import PromptTemplate
     from langchain.memory import ConversationBufferMemory
     from langchain.schema import BaseMessage
     from langchain.tools import Tool
@@ -198,11 +199,40 @@ class OrchestratorAgent:
                 llm_for_agent = self.llm
                 print("🔄 Using LLM directly")
             
-            # Use ZERO_SHOT_REACT_DESCRIPTION as it's more compatible
-            agent = initialize_agent(
-                tools=self.tools,
+            # Create a custom prompt template
+            prompt_template = (
+                "You are an AI assistant with access to various tools. "
+                "Use the tools when needed to help answer questions or complete tasks.\n\n"
+                "You have access to the following tools:\n"
+                "{tools}\n\n"
+                "Use the following format:\n"
+                "Question: the input question you must answer\n"
+                "Thought: you should always think about what to do\n"
+                "Action: the action to take, should be one of [{tool_names}]\n"
+                "Action Input: the input to the action\n"
+                "Observation: the result of the action\n"
+                "... (this Thought/Action/Action Input/Observation can repeat N times)\n"
+                "Thought: I now know the final answer\n"
+                "Final Answer: the final answer to the original input question\n\n"
+                "Begin!\n\n"
+                "Question: {input}\n"
+                "{agent_scratchpad}"
+            )
+            prompt = PromptTemplate(
+                input_variables=["agent_scratchpad", "input", "tool_names", "tools"],
+                template=prompt_template
+            )
+
+            # Use a custom agent with the new prompt
+            agent = create_react_agent(
                 llm=llm_for_agent,
-                agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+                tools=self.tools,
+                prompt=prompt
+            )
+
+            agent_executor = AgentExecutor(
+                agent=agent,
+                tools=self.tools,
                 memory=self.memory,
                 verbose=True,
                 max_iterations=3,
@@ -211,7 +241,7 @@ class OrchestratorAgent:
                 handle_parsing_errors=True
             )
             print("✅ Agent executor setup complete")
-            return agent
+            return agent_executor
         except Exception as e:
             print(f"❌ Agent setup failed: {e}")
             return None
@@ -243,7 +273,7 @@ class OrchestratorAgent:
         
         try:
             # Add context to the message if provided
-            full_message = f"{message}\n\nContext: {context}" if context else message
+            full_message = message
             print(f"📝 Full message to agent: '{full_message[:200]}...'")
             
             # Log model and payload info
@@ -254,9 +284,10 @@ class OrchestratorAgent:
             tools_used = []
             try:
                 print("🤖 Starting agent execution (async)...")
+                # Combine all inputs into a single input string for the agent
+                combined_input = f"Context: {context}\n\nQuestion: {full_message}"
                 agent_result = await self.agent_executor.ainvoke({
-                    "input": full_message,
-                    "chat_history": self.memory.chat_memory.messages
+                    "input": combined_input
                 })
                 result = agent_result.get("output", str(agent_result))
                 print(f"✅ Agent execution completed: '{result[:100]}...'")
@@ -265,9 +296,9 @@ class OrchestratorAgent:
                 # Fallback to synchronous execution
                 try:
                     print("🔄 Trying synchronous execution...")
+                    combined_input = f"Context: {context}\n\nQuestion: {full_message}"
                     agent_result = self.agent_executor.invoke({
-                        "input": full_message,
-                        "chat_history": self.memory.chat_memory.messages
+                        "input": combined_input
                     })
                     result = agent_result.get("output", str(agent_result))
                     print(f"✅ Sync execution completed: '{result[:100]}...'")

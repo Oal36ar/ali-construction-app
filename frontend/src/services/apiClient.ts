@@ -494,7 +494,7 @@ class ApiClient {
       formData.append('intent', intent)
     }
     
-    return this.uploadRequest('/upload', formData)
+    return this.uploadRequest('/upload/', formData)
   }
 
   // Confirmation endpoint

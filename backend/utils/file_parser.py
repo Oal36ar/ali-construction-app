@@ -33,6 +33,9 @@ def parse_file_by_type(filename: str, content: bytes) -> Dict[str, str]:
         elif file_type == "docx":
             text, metadata = _parse_docx_content(content, filename)
             preview = f"{metadata.get('paragraphs', 0)} paragraphs, {metadata.get('tables', 0)} tables"
+        elif file_type == "text":
+            text, metadata = _parse_txt_content(content, filename)
+            preview = f"{metadata.get('lines', 0)} lines, {metadata.get('characters', 0)} characters"
         else:
             # Default: decode first 1000 chars raw
             try:
@@ -82,8 +85,9 @@ def _parse_pdf_content(content: bytes, filename: str) -> Tuple[str, Dict[str, An
     try:
         doc = fitz.open(stream=content, filetype="pdf")
         text_content = []
+        page_count = len(doc)
         
-        for page_num in range(len(doc)):
+        for page_num in range(page_count):
             page = doc.load_page(page_num)
             text_content.append(f"--- Page {page_num + 1} ---\n")
             text_content.append(page.get_text())
@@ -93,7 +97,7 @@ def _parse_pdf_content(content: bytes, filename: str) -> Tuple[str, Dict[str, An
         
         full_text = "".join(text_content)
         metadata = {
-            "pages": len(doc),
+            "pages": page_count,
             "type": "pdf",
             "title": filename
         }
@@ -226,6 +230,35 @@ def _parse_docx_content(content: bytes, filename: str) -> Tuple[str, Dict[str, A
     except Exception as e:
         return f"Error parsing Word document: {str(e)}", {"error": str(e), "type": "docx"}
 
+def _parse_txt_content(content: bytes, filename: str) -> Tuple[str, Dict[str, Any]]:
+    """Parse TXT file content"""
+    try:
+        # Try UTF-8 first, then fallback to other encodings
+        try:
+            text = content.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                text = content.decode('latin-1')
+            except UnicodeDecodeError:
+                text = content.decode('utf-8', errors='ignore')
+        
+        # Count lines and characters
+        lines = text.split('\n')
+        line_count = len(lines)
+        char_count = len(text)
+        
+        metadata = {
+            "lines": line_count,
+            "characters": char_count,
+            "type": "text",
+            "encoding": "utf-8"
+        }
+        
+        return text, metadata
+        
+    except Exception as e:
+        return f"Error parsing text file: {str(e)}", {"error": str(e), "type": "text"}
+
 # Legacy FileParser class for backward compatibility
 class FileParser:
     
@@ -238,4 +271,4 @@ class FileParser:
     async def parse_file(file_content: bytes, file_type: str, filename: str) -> Tuple[str, Dict[str, Any]]:
         """Legacy method - use parse_file_by_type function instead"""
         result = parse_file_by_type(filename, file_content)
-        return result["text"], {"type": file_type, "preview": result["preview"]} 
+        return result["text"], {"type": file_type, "preview": result["preview"]}

@@ -45,6 +45,7 @@ class FileUpload(Base):
     intent = Column(String)  # extract_reminders, summarize, etc.
     processed = Column(Boolean, default=False)
     result = Column(JSON)  # Store processing results
+    content = Column(Text)  # Store the actual parsed file content
     uploaded_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(String, default="default")
 
@@ -67,4 +68,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close() 
+        db.close()
