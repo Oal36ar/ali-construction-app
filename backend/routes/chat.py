@@ -253,7 +253,7 @@ async def chat_main(
                 try:
                     print(f"🔄 Processing with LLM Orchestrator...")
                     # Use enhanced message instead of original
-                    agent = agent_manager.get_or_create_agent(session_id, db_session=db)
+                    agent = agent_manager.get_agent(session_id, db_session=db)
                     result = await agent.process_message(enhanced_message)
                     response_text = result.get("response", "")
                     print(f"✅ LLM Orchestrator result received")

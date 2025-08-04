@@ -3,7 +3,7 @@
     "content": "--- Page 1 ---\nINTERNSHIP\nREPORT\nShowflix Multimedia\n Omar Nabulsi\n Student ID: U22100418\n Training Period: June 1 \u2013 July 10, 2025\n\n--- Page 2 ---\nInternship in Software Engineering & DevOps\nKey Projects:\nLaravel-based financial & VPS systems\nStreaming web applications for Smart TVs\nObjectives:\nBuild scalable, secure, user-friendly solutions\nApply Laravel MVC & DevOps practices\nINTRODUCTION\n\n--- Page 3 ---\nCOMPANY\nOVERVIEW\nLocation: Nablus, West Bank\nIndustry: Software & Streaming\nServices:\nStreaming solutions\nCustom Laravel applications\nFocus:\nArabic market\nDevOps-driven deployments\n\n--- Page 4 ---\nINTERNSHIP\nTIMELINE \nWeek\nFocus\n1\n2\n3\n4\n5\nLinux, Networking, Automation\nWeb stack: Apache, PHP, Laravel\nDeployment, Git, Modularization\nFinancial Management System\nProxmox VPS Module & API\n6\nStreaming Solutions Web Application\n\n--- Page 5 ---\nLINUX & NETWORKING\nWEEK 1\nLinux \nadministration: \nfilesystems, \nusers,\npermissions\nNetwork setup: static IP, FortiGate firewall &\nautomation",
     "source": "Final Presentation.pdf",
     "chunk_index": 0,
-    "created_at": "2025-08-02T18:35:51.209241",
+    "created_at": "2025-08-04T04:14:58.870315",
     "metadata": {
       "length": 990,
       "source_file": "Final Presentation.pdf",
@@ -14,7 +14,7 @@
     "content": "--- Page 5 ---\nLINUX & NETWORKING\nWEEK 1\nLinux \nadministration: \nfilesystems, \nusers,\npermissions\nNetwork setup: static IP, FortiGate firewall &\nautomation\n\n--- Page 5 ---\nLINUX & NETWORKING\nWEEK 1\nLinux \nadministration: \nfilesystems, \nusers,\npermissions\nNetwork setup: static IP, FortiGate firewall &\nautomation\n\n--- Page 6 ---\nWEB STACK & LARAVEL\nWEEK 2\nApache & PHP configuration\nLaravel installation & MVC pattern\nCustomer & Invoice management API\n\n--- Page 7 ---\nADVANCED LARAVEL\nWEEK 3\nDeployment \nof \nLaravel \ndashboard \non\nproduction server\nPostgreSQL database tuning & HTTPS setup\nModular customer module with secure API\ntokens\nGit version control & collaborative workflows\n\n--- Page 8 ---\nFINANCIAL MANAGEMENT SYSTEM\nWEEK 4\nBalance tracking & transactions\nPayroll, receivables, assets & liabilities\nMonthly summaries for managers\n\n--- Page 9 ---\nPROXMOX VIRTUALIZATION\nWEEK 5\nServer & subscription management\nAutomated VPS provisioning\nPublic API for webstore integration",
     "source": "Final Presentation.pdf",
     "chunk_index": 1,
-    "created_at": "2025-08-02T18:35:51.209251",
+    "created_at": "2025-08-04T04:14:58.870323",
     "metadata": {
       "length": 981,
       "source_file": "Final Presentation.pdf",
@@ -25,7 +25,7 @@
     "content": "--- Page 9 ---\nPROXMOX VIRTUALIZATION\nWEEK 5\nServer & subscription management\nAutomated VPS provisioning\nPublic API for webstore integration\n\n--- Page 9 ---\nPROXMOX VIRTUALIZATION\nWEEK 5\nServer & subscription management\nAutomated VPS provisioning\nPublic API for webstore integration\n\n--- Page 10 ---\nSTREAMING SOLUTIONS WEB APP\nWEEK 6\nWhite-label demo app for Arabic streaming\nproviders\nRTL layout, modular & scalable\nLive streams, movies, series & favorites\n\n--- Page 11 ---\nTOOLS & BEST PRACTICES\nLaravel, Sanctum, Spatie, Composer\nApache, PostgreSQL, Redis\nProxmox VE, GitHub, Certbot, Cloudflare\nModular design, MVC, RBAC\nHTTPS & secure tokens\nTesting, documentation & automation\nTOOLS\n\u2705 BEST PRACTICES",
     "source": "Final Presentation.pdf",
     "chunk_index": 2,
-    "created_at": "2025-08-02T18:35:51.209253",
+    "created_at": "2025-08-04T04:14:58.870325",
     "metadata": {
       "length": 706,
       "source_file": "Final Presentation.pdf",
@@ -36,11 +36,22 @@
     "content": "--- Page 12 ---\nCONCLUSION\nI have learned:\nLaravel development in production\nDevOps, virtualization, streaming systems\nProfessional deployment & security practices\nWhat I\u2019d like to learn soon / recommend exploring:\nCI/CD pipelines\nKubernetes & Docker adoption\nAdvanced monitoring & testing suites\n\n--- Page 13 ---\nTHANK YOU",
     "source": "Final Presentation.pdf",
     "chunk_index": 3,
-    "created_at": "2025-08-02T18:35:51.209255",
+    "created_at": "2025-08-04T04:14:58.870326",
     "metadata": {
       "length": 323,
       "source_file": "Final Presentation.pdf",
       "chunk_id": "Final Presentation.pdf_3"
+    }
+  },
+  {
+    "content": "Word Document: Final Report cover template (English).docx\n\nPractical Training Final Report\nCollege of \u2026\u2026\u2026\u2026\u2026\u2026\u2026..\nDepartment of \u2026\u2026\u2026\u2026\u2026\u2026\u2026..\nPractical Training Course Number (\u2026\u2026\u2026\u2026\u2026\u2026\u2026..) \n\u2026\u2026\u2026\u2026\u2026\u2026\u2026.. Semester \nAcademic Year \u2026\u2026\u2026\u2026\u2026\u2026\u2026..\nStudent Name\nStudent ID\nTraining Organization Name\nTraining period From: \u2026\u2026\u2026\u2026\u2026. To: \u2026\u2026\u2026\u2026\nAcademic Supervisor\u2019s Name",
+    "source": "Final Report cover template (English).docx",
+    "chunk_index": 0,
+    "created_at": "2025-08-04T04:15:51.222617",
+    "metadata": {
+      "length": 341,
+      "source_file": "Final Report cover template (English).docx",
+      "chunk_id": "Final Report cover template (English).docx_0"
     }
   }
 ]
